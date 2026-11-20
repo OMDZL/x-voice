@@ -6,19 +6,28 @@ Starting a voice chat with a Grok Bot on my PC always takes a manual click: open
 
 You do not install Python. You download the app, run it, and fill in the settings window.
 
+## Before you use it
+
+- **Early, AI-built hobby project.** I built x-voice with AI coding tools and use it daily, but it has been tested on one PC. Use it at your own risk. There is no warranty (see the [MIT License](LICENSE)) and no promise of support.
+- **Anyone can say the wake phrase.** A TV, a video, or someone on a call saying it can start a voice chat, and Grok Bot will then hear your room. Raise **How sure**, use **Pause**, or pick a less common phrase if that matters to you.
+- **Grok Bot updates may break it.** x-voice depends on Grok Bot's link and button names, which can change without notice. If something no longer matches, x-voice clicks nothing and says why in the status line.
+
 ## Download and run
 
 The app is a folder with `x-voice.exe` inside. The rest of the folder is part of the app. Leave those files next to the exe.
 
-1. Sign in to GitHub and open this repository.
-2. Click **Actions**.
-3. Click **Build Windows app** on the left.
-4. Open the latest run with a green check.
-5. At the bottom, under **Artifacts**, download **x-voice-windows**.
-6. Unzip it. You get a folder named `x-voice`.
-7. Open that folder and double-click **x-voice.exe**. Do not move the exe out of the folder.
+1. Open this repository's **Releases** page and download **x-voice-windows.zip** from the latest release.
+2. Right-click the zip and choose **Extract All**. You get a folder named `x-voice`.
+3. Open that folder and double-click **x-voice.exe**. Do not move the exe out of the folder.
 
-When a version tag such as `v0.2.0` is published, the same zip is also on the repository **Releases** page. Download **x-voice-windows.zip** from there if you see it.
+### Newest build (optional)
+
+Every change to `main` is also built on GitHub Actions. Those builds can be newer than the latest release, and they need a GitHub sign-in to download.
+
+1. Sign in to GitHub, open this repository, and click **Actions**.
+2. Click **Build Windows app** on the left, then the latest run with a green check.
+3. At the bottom, under **Artifacts**, download **x-voice-windows**.
+4. GitHub wraps that download in a zip of its own, so extract it twice: once to get `x-voice-windows.zip`, then that zip to get the `x-voice` folder.
 
 ### If Windows says it protected your PC
 
@@ -34,7 +43,7 @@ That warning is Windows being careful about a new program. It is the same exe bu
 The window opens the first time, because the bot id is not filled in yet. Set:
 
 - **Wake phrase.** It starts on **Computer**. That model also hears "hey computer". The other built-in phrases are still in the list, including hey jarvis. **Custom wake word file (.onnx)…** lets you pick a file on this PC. x-voice checks it and copies it into `%APPDATA%\x-voice\models`. It does not download the file.
-- **Grok Bot id.** Paste the id, or paste the whole share link. x-voice keeps the id and drops the rest of the link. In Grok Bot: click the bot's name, choose **Share**, then **Copy link**.
+- **Grok Bot id.** The id of the bot that x-voice should open. The quickest way to get it is to ask your voice bot in Grok Bot: "What is your bot ID?", then copy and paste the answer. If x-voice later says Grok Bot did not switch to the voice bot, get the id from the share link instead: click the bot's name, choose **Share**, then **Copy link**, and paste the whole link. x-voice keeps the id and drops the rest of the link.
 - **Microphone.** **Windows default**, or pick one from the list. **Refresh** updates the list. **Test mic** shows a short level meter. Nothing from that test is saved.
 - **How sure.** This is the sensitivity slider. A higher number means x-voice must be more sure before it starts a call, so a television or someone saying the word in passing starts fewer calls. A lower number makes it easier to trigger, and also easier to trigger by mistake. Computer is a common word, so a new install starts at **0.75**, and the score has to stay that high for three moments in a row (about a quarter of a second). The other phrases start at **0.50** and can trigger on one moment. After you pick a phrase, you can still move the slider, then click **Save**. If Computer starts when you did not say it, move How sure up, toward 0.85 or 0.90. If it misses you, move it down a little, toward 0.60.
 - **Cooldown.** Seconds to wait after a call, or after a click that did not start one. The starting value is 10.
@@ -98,7 +107,7 @@ Useful commands:
 
 `python -m xvoice.setup_models` is the only command that downloads anything. The running app does not. The Windows build does that download on the build machine and packs the model files into the zip.
 
-The build is a folder, not a single file. onnxruntime's DLLs are unreliable inside a one-file exe. GitHub Actions on `windows-latest` runs `x-voice.spec` with Python 3.11, zips `dist\x-voice`, uploads the artifact, and runs `x-voice.exe --self-test`. Pushing a tag named like `v0.2.0` also attaches that zip to a GitHub Release.
+The build is a folder, not a single file. onnxruntime's DLLs are unreliable inside a one-file exe. GitHub Actions on `windows-latest` runs `x-voice.spec` with Python 3.11, zips `dist\x-voice`, uploads the artifact, and runs `x-voice.exe --self-test`. Pushing a version tag such as `v0.2.0` or `0.2.0` also attaches that zip to a GitHub Release.
 
 ## License
 
