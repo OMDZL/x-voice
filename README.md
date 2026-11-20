@@ -16,8 +16,8 @@ You do not install Python. You download the app, run it, and fill in the setting
 
 The app is a folder with `x-voice.exe` inside. The rest of the folder is part of the app. Leave those files next to the exe.
 
-1. Open this repository's **Releases** page and download **x-voice-windows.zip** from the latest release.
-2. Right-click the zip and choose **Extract All**. You get a folder named `x-voice`.
+1. Open this repository's **Releases** page. Under **Assets** in the latest release, download **x-voice-windows.zip**. That is the app. Ignore the two **Source code** files: GitHub adds them to every release automatically, and they will not run.
+2. Right-click **x-voice-windows.zip** and choose **Extract All**. You get a folder named `x-voice`.
 3. Open that folder and double-click **x-voice.exe**. Do not move the exe out of the folder.
 
 ### Newest build (optional)
