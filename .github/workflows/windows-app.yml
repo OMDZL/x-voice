@@ -1,0 +1,91 @@
+name: Build Windows app
+
+on:
+  push:
+    branches:
+      - main
+      - "cursor/**"
+    tags:
+      - "v*"
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install pinned packages
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --require-hashes -r requirements.lock
+          python -m pip install --require-hashes -r requirements-build.txt
+
+      - name: Confirm tkinter is available
+        run: python -c "import tkinter"
+
+      - name: Download wake-word models for the bundle
+        run: python -m xvoice.setup_models
+
+      - name: Build the one-folder app
+        run: python -m PyInstaller --noconfirm --clean x-voice.spec
+
+      - name: Smoke test the exe
+        shell: pwsh
+        run: |
+          $exe = Join-Path $PWD "dist\x-voice\x-voice.exe"
+          if (-not (Test-Path $exe)) { throw "x-voice.exe was not built" }
+          # The exe is a windowed app, so the call operator returns before it exits.
+          $proc = Start-Process -FilePath $exe -ArgumentList "--self-test" -Wait -PassThru
+          $code = $proc.ExitCode
+          $log = Join-Path $env:TEMP "x-voice-self-test.txt"
+          Write-Host "self-test exit $code"
+          if (-not (Test-Path $log)) { throw "self-test did not write a result" }
+          $text = Get-Content $log -Raw
+          Write-Host $text
+          if ($text.Trim() -ne "ok") { throw "self-test failed: $text" }
+          if ($code -ne 0) { exit $code }
+
+      - name: Zip the app folder
+        shell: pwsh
+        run: |
+          if (Test-Path x-voice-windows.zip) { Remove-Item x-voice-windows.zip }
+          Copy-Item LICENSE, THIRD_PARTY_NOTICES.md dist\x-voice\
+          tar.exe -a -c -f x-voice-windows.zip -C dist x-voice
+
+      - name: Upload the app
+        uses: actions/upload-artifact@v4
+        with:
+          name: x-voice-windows
+          path: x-voice-windows.zip
+          if-no-files-found: error
+
+      - name: Attach the zip to the GitHub release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          $PSNativeCommandUseErrorActionPreference = $false
+          $tag = "${{ github.ref_name }}"
+          gh release view $tag
+          if ($LASTEXITCODE -ne 0) {
+            gh release create $tag x-voice-windows.zip --title $tag --notes "Windows desktop build of x-voice. Unzip the folder and run x-voice.exe inside it."
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          } else {
+            gh release upload $tag x-voice-windows.zip --clobber
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }

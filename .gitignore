@@ -1,0 +1,25 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# The owner's config has their bot id. The example file is the one to commit.
+config.toml
+
+# Wake-word models are downloaded by the one-time setup. They are not source.
+models/
+
+# Audio must never be written. Ignore these extensions if one ever appears.
+*.wav
+*.flac
+*.mp3
+*.ogg
+*.pcm
+*.raw
+*.partial

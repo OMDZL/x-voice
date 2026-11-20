@@ -1,0 +1,10 @@
+[project]
+name = "xvoice"
+version = "0.2.0"
+description = "Local wake word that starts a Grok Bot voice chat on Windows"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
